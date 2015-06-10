@@ -2,6 +2,7 @@ package com.tcm.sunshine.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -51,15 +52,28 @@ public class ForecastFragment extends Fragment {
             updateWeather();
             return true;
         }
+        if (item.getItemId() == R.id.action_view_map) {
+            launchMapIntent();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateWeather() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String location= preferences.getString(getString(R.string.pref_location_key), "");
+    private void launchMapIntent() {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + getLocationPreference()));
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
 
+    private void updateWeather() {
         FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(adapter);
-        fetchWeatherTask.execute(location);
+        fetchWeatherTask.execute(getLocationPreference());
+    }
+
+    private String getLocationPreference() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        return preferences.getString(getString(R.string.pref_location_key), "london");
     }
 
     @Override
