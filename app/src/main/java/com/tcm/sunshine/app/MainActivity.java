@@ -6,14 +6,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
@@ -61,4 +65,33 @@ public class MainActivity extends AppCompatActivity {
         return preferences.getString(getString(R.string.pref_location_key), "london");
     }
 
+    @Override
+    protected void onPause() {
+        Log.d(LOG_TAG, "onPause()");
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(LOG_TAG, "onResume()");
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(LOG_TAG, "onStop()");
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        Log.d(LOG_TAG, "onStart()");
+        super.onStart();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "onDestroy()");
+        super.onDestroy();
+    }
 }
