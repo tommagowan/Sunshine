@@ -1,7 +1,8 @@
 package com.tcm.sunshine.app;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -11,33 +12,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
+import com.tcm.sunshine.app.data.WeatherContract;
 
 public class ForecastFragment extends Fragment {
 
-    private ArrayAdapter<String> adapter;
-
+    private ForecastAdapter adapter;
 
     @Override
     public void onStart() {
         super.onStart();
-        updateWeather();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        adapter = new ArrayAdapter<>(
-                getActivity(),
-                R.layout.list_item_forecast,
-                R.id.list_item_forecast_textview,
-                new ArrayList<String>());
-
+//        updateWeather();
     }
 
     @Override
@@ -55,7 +41,7 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateWeather() {
-        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(getActivity(), adapter);
+        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(getActivity());
         fetchWeatherTask.execute(getLocationPreference());
     }
 
@@ -67,17 +53,31 @@ public class ForecastFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listView = (ListView) view.findViewById(R.id.listview_forecast);
+
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+
+        // Sort order:  Ascending, by date.
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
+
+        Cursor cur = getActivity().getContentResolver().query(weatherForLocationUri,
+                null, null, null, sortOrder);
+
+        adapter = new ForecastAdapter(getActivity(), cur, 0);
+
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-                detailIntent.putExtra(Intent.EXTRA_TEXT, adapter.getItem(position));
-                startActivity(detailIntent);
-            }
-        });
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
+//                detailIntent.putExtra(Intent.EXTRA_TEXT, adapter.getItem(position));
+//                startActivity(detailIntent);
+//            }
+//        });
 
         return view;
     }
