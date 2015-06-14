@@ -55,7 +55,7 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateWeather() {
-        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(adapter);
+        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(getActivity(), adapter);
         fetchWeatherTask.execute(getLocationPreference());
     }
 
